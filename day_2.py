@@ -1,11 +1,22 @@
-def get_direction(contents):
-    if contents[0] > contents[1]:
+def get_single_direction(x, y):
+    if x > y:
         direction = -1
-    elif contents[0] < contents[1]:
+    elif x < y:
         direction = 1
     else:
         direction = 0
     return(direction)
+
+def get_direction(contents):
+    three_dirs = [get_single_direction(contents[i], contents[i+1]) for i in range(0, 3)]
+    if three_dirs[0] == three_dirs[1]:
+        return three_dirs[0]
+    elif three_dirs[0] == three_dirs[2]:
+        return three_dirs[0]
+    elif three_dirs[1] == three_dirs[2]:
+        return three_dirs[1]
+    else:
+        return 99
 
 def check_safety(item1, item2, direction):
     diff = (item2 - item1) * direction
@@ -14,20 +25,24 @@ def check_safety(item1, item2, direction):
     else:
         return False
 
-def check_all_safety(list, tolerance):
+def check_all_safety(list, tolerance = False):
     direction = get_direction(list)
-    safe = True
+    safe = False if direction == 99 else True
     j = 0
-    current_errors = 0
-    while safe == True and j < (len(list) - 1) and current_errors <= tolerance:
+    found_error = False
+    while safe == True and j < (len(list) - 1):
         safety = check_safety(list[j], list[j+1], direction)
         if not safety:
-            if current_errors == tolerance:
+            if found_error or not tolerance:
                 safe = False
             else:
-                current_errors += 1
-            if j < len(list) - 2 and check_safety(list[j], list[j+2], direction):
-                j += 1
+                found_error = True
+            if j < len(list) - 2:
+                can_skip = check_safety(list[j], list[j+2], direction)
+                if can_skip:
+                    j += 1
+                elif j > 0:
+                    safe = False
         j += 1
     return(safe)
 
@@ -36,7 +51,7 @@ total_safety = 0
 with open("Inputs/Input day 2", "r") as input_file:
     for line in input_file:
         contents = [int(i) for i in line.split()]
-        total_safety += check_all_safety(contents, tolerance = 0)
+        total_safety += check_all_safety(contents)
 
 print(total_safety)
 
@@ -45,6 +60,6 @@ total_safety_2 = 0
 with open("Inputs/Input day 2", "r") as input_file:
     for line in input_file:
         contents = [int(i) for i in line.split()]
-        total_safety_2 += check_all_safety(contents, tolerance = 1)
+        total_safety_2 += check_all_safety(contents, tolerance = True)
 
 print(total_safety_2)
