@@ -28,7 +28,23 @@ for direction in directions:
     xmases = [index for index in x_indices if (index + direction in m_indices and
                                                index + 2*direction in a_indices and
                                                index + 3*direction in s_indices and
+                                               #Check to exclude words wrapping the egde of the grid
                                                (abs(index % line_length - (index + 3*direction) % line_length)) <= 3)]
     starting_xs.append(xmases)
 
 answer = sum([len(x) for x in starting_xs])
+
+#Part 2
+def m_or_s(index):
+    if index in m_indices:
+        return 1
+    elif index in s_indices:
+        return 2
+    else:
+        return 0
+    
+x_mases = [index for index in a_indices if (m_or_s(index + line_length + 1) + m_or_s(index - line_length - 1) == 3
+                                            and m_or_s(index - line_length + 1) + m_or_s(index + line_length - 1) == 3
+                                            and index % line_length not in [0, line_length - 1])]
+    
+answer_2 = len(x_mases)
