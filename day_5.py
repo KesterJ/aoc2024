@@ -41,6 +41,18 @@ def check_book(book):
             return 0
     return int(book[int((len(book) - 1) / 2)])
 
+def get_wrong_book(book):
+    ordering = get_ordering([relation for relation in relations if 
+                             (relation[0] in book and relation[1] in book)])
+    ordering_reverse = {value: key for key, value in ordering.items()}
+    for i in range(0,len(book) - 1):
+        if ordering[book[i]] > ordering[book[i+1]]:
+            rank_book = [ordering[page] for page in book]
+            rank_book.sort()
+            reconstituted_book = [ordering_reverse[rank] for rank in rank_book]
+            return int(reconstituted_book[int((len(reconstituted_book) - 1) / 2)])
+    return 0
+
 #Part 1
 with open('Inputs/Input day 5', 'r') as input_file:
     lines = input_file.readlines()
@@ -51,3 +63,4 @@ relations = [i.split('|') for i in lines[:file_divider]]
 books = [i.split(',') for i in lines[file_divider+1:]]
 
 p1_total = sum([check_book(book) for book in books])
+p2_total = sum([get_wrong_book(book) for book in books])
