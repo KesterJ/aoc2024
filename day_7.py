@@ -1,3 +1,5 @@
+from datetime import datetime
+
 def cat_numbers(num1, num2):
     return(int(str(num1) + str(num2)))
 
@@ -12,24 +14,23 @@ def carol(problem, concatenation = False):
             return(True)
         else:
             return(False)
-    #Check factorisation
-    if total % numbers[0] == 0:
-        with_multiply = carol([total // numbers[0], numbers[1:]], concatenation = concatenation)
-    else:
-        with_multiply = False
     #Check concatenation
     total_str = str(total)
     current_str = str(numbers[0])
     if concatenation == True and len(total_str) > len(current_str) and total_str[-len(current_str):] == current_str:
         with_concat = carol([int(total_str[:-len(current_str)]), numbers[1:]], concatenation = concatenation)
-    else:
-        with_concat = False
+        if with_concat:
+            return(True)
+    #Check factorisation
+    if total % numbers[0] == 0:
+        with_multiply = carol([total // numbers[0], numbers[1:]], concatenation = concatenation)
+        if with_multiply:
+            return(True)
     if numbers[0] < total:
         with_add = carol([total - numbers[0], numbers[1:]], concatenation = concatenation)
-    else:
-        with_add = False
-    result = with_multiply or with_concat or with_add
-    return result
+        if with_add:
+            return(True)
+    return False
 
 with open('Inputs/Input day 7', 'r') as input_file:
     inputs = input_file.readlines()
@@ -42,4 +43,6 @@ for i in range(0, len(problems)):
     problems[i][1].reverse()
 
 answer = sum([problem[0] for problem in problems if carol(problem)])
+print(datetime.now())
 answer_2 = sum([problem[0] for problem in problems if carol(problem, concatenation = True)])
+print(datetime.now())
