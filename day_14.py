@@ -1,4 +1,7 @@
 from re import findall
+import numpy as np
+import copy
+from matplotlib import pyplot as plt
 
 def process_line(line):
     matches = findall("(-?\d+)", line)
@@ -43,3 +46,32 @@ height = 103
 move_robots(robot_dict, times = 100, width = width, height = height)
 quadrants = [find_quadrant(robot_dict[robot], width = width, height = height) for robot in robot_dict]
 answer_1 = get_answer(quadrants)
+
+#Part 2
+def check_quadrants(times):
+    quad_totals = []
+    for tick in range(1, times + 1):
+        move_robots(robot_dict, times = 1, width = width, height = height)
+        quadrants = [find_quadrant(robot_dict[robot], width = width, height = height) for robot in robot_dict]
+        quad_totals.append(get_answer(quadrants))
+    return quad_totals
+
+def visualise_positions(robot_dict):
+    locations = np.zeros([width, height])
+    for robot in robot_dict:
+        locations[robot_dict[robot]["x_pos"], robot_dict[robot]["y_pos"]] += 1
+    plt.matshow(locations)
+
+with open('Inputs/Input day 14', 'r') as input_file:
+    lines = input_file.readlines()
+    robot_dict = {i: process_line(line) for i, line in enumerate(lines)}
+
+backup_robots = copy.deepcopy(robot_dict)
+
+width = 101
+height = 103   
+quads = check_quadrants(times = 10403)
+
+least_balanced = quads.index(min(quads))
+move_robots(backup_robots, times = least_balanced + 1, width = width, height = height)
+visualise_positions(backup_robots)
